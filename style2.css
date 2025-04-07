@@ -1,0 +1,335 @@
+ /* iOS Style Music Player */
+ body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f2f2f7;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .navbar {
+    background-color: rgba(242, 242, 247, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 10px 15px;
+  }
+  
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+  
+  .player-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .album-art-container {
+    position: relative;
+    margin: 20px 0 40px;
+    align-self: center;
+  }
+  
+  .album-art {
+    width: 280px;
+    height: 280px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .song-info {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .song-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .artist {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 0;
+  }
+  
+  .progress-container {
+    margin: 20px 0;
+  }
+  
+  .progress-bar {
+    height: 3px;
+    background-color: #ddd;
+    border-radius: 3px;
+    position: relative;
+  }
+  
+  .progress {
+    height: 100%;
+    background-color: #ff2d55;
+    border-radius: 3px;
+    width: 0;
+  }
+  
+  .progress-handle {
+    width: 12px;
+    height: 12px;
+    background-color: #ff2d55;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .progress-container:hover .progress-handle {
+    opacity: 1;
+  }
+  
+  .time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 30px 0;
+  }
+  
+  .control-btn {
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .play-btn {
+    background-color: #000;
+    color: #fff;
+    width: 70px;
+    height: 70px;
+  }
+  
+  .play-btn i {
+    margin-left: 3px;
+  }
+  
+  .volume-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .volume-icon {
+    color: #888;
+  }
+  
+  .volume-bar {
+    flex: 1;
+    height: 3px;
+    background-color: #ddd;
+    border-radius: 3px;
+    position: relative;
+  }
+  
+  .volume-progress {
+    height: 100%;
+    background-color: #888;
+    border-radius: 3px;
+    width: 80%;
+  }
+  
+  .now-playing-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(242, 242, 247, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .now-playing-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 15px;
+  }
+  
+  .now-playing-info {
+    flex: 1;
+  }
+  
+  .now-playing-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  
+  .now-playing-artist {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .now-playing-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .now-playing-btn {
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 1.2rem;
+  }
+  
+  .playlist {
+    background-color: #fff;
+    border-radius: 15px;
+    margin-top: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .playlist-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .playlist-item:last-child {
+    border-bottom: none;
+  }
+  
+  .playlist-item.active {
+    background-color: #f5f5f5;
+  }
+  
+  .playlist-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 15px;
+  }
+  
+  .playlist-item-info {
+    flex: 1;
+  }
+  
+  .playlist-item-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  
+  .playlist-item-artist {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .playlist-item-duration {
+    font-size: 0.8rem;
+    color: #888;
+  }
+  
+  /* Dark mode styles */
+  body.dark-mode {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  body.dark-mode .navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  body.dark-mode .artist,
+  body.dark-mode .playlist-item-artist,
+  body.dark-mode .now-playing-artist {
+    color: #aaa;
+  }
+  
+  body.dark-mode .control-btn,
+  body.dark-mode .now-playing-btn {
+    color: #fff;
+  }
+  
+  body.dark-mode .play-btn {
+    background-color: #fff;
+    color: #000;
+  }
+  
+  body.dark-mode .playlist {
+    background-color: #1c1c1e;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  body.dark-mode .playlist-item {
+    border-bottom: 1px solid #333;
+  }
+  
+  body.dark-mode .playlist-item.active {
+    background-color: #2c2c2e;
+  }
+  
+  body.dark-mode .now-playing-bar {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  body.dark-mode .progress-bar,
+  body.dark-mode .volume-bar {
+    background-color: #333;
+  }
+  
+  /* Animation for album art */
+  @keyframes rotateAlbumArt {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .playing .album-art {
+    animation: rotateAlbumArt 20s linear infinite;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 500px) {
+    .album-art {
+      width: 240px;
+      height: 240px;
+    }
+    
+    .controls {
+      gap: 20px;
+    }
+  }
