@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WavyBeats</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    /* Pink Theme */
+    :root {
+      --primary-color: #ff2d55;
+      --secondary-color: #ff8fab;
+      --background-color: #fff0f3;
+      --text-color: #333;
+      --card-bg: #ffffff;
+      --progress-bg: #ffe5ec;
+      --navbar-bg: rgba(255, 240, 243, 0.8);
+      --now-playing-bg: rgba(255, 240, 243, 0.8);
+    }
+
+    .dark-mode {
+      --primary-color: #ff758f;
+      --secondary-color: #ff8fab;
+      --background-color: #2a0a14;
+      --text-color: #fff;
+      --card-bg: #3a1a24;
+      --progress-bg: #4a2a34;
+      --navbar-bg: rgba(42, 10, 20, 0.8);
+      --now-playing-bg: rgba(42, 10, 20, 0.8);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    /* Floating Hearts Animation */
+    .hearts-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      opacity: 0;
+      color: var(--secondary-color);
+      animation: float-up 15s linear infinite;
+    }
+
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-20vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .navbar {
+      background-color: var(--navbar-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 45, 85, 0.1);
+      padding: 10px 15px;
+    }
+
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+    }
+
+    .player-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .album-art-container {
+      position: relative;
+      margin: 20px 0 40px;
+      align-self: center;
+    }
+
+    .album-art {
+      width: 280px;
+      height: 280px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 8px 30px rgba(255, 45, 85, 0.3);
+    }
+
+    .song-info {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .song-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .artist {
+      font-size: 1.1rem;
+      color: var(--primary-color);
+      margin-bottom: 0;
+    }
+
+    .progress-container {
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      height: 3px;
+      background-color: var(--progress-bg);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--primary-color);
+      border-radius: 3px;
+      width: 0;
+    }
+
+    .progress-handle {
+      width: 12px;
+      height: 12px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .progress-container:hover .progress-handle {
+      opacity: 1;
+    }
+
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--primary-color);
+      margin-top: 5px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      margin: 30px 0;
+    }
+
+    .control-btn {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    .play-btn {
+      background-color: var(--primary-color);
+      color: #fff;
+      width: 70px;
+      height: 70px;
+    }
+
+    .play-btn i {
+      margin-left: 3px;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px var(--secondary-color);
+    }
+
+    .now-playing-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--now-playing-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 45, 85, 0.1);
+      padding: 10px 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .now-playing-img {
+      width: 50px;
+      height: 50px;
+      border-radius: 5px;
+      margin-right: 15px;
+    }
+
+    .now-playing-info {
+      flex: 1;
+    }
+
+    .now-playing-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .now-playing-artist {
+      font-size: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .now-playing-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .now-playing-btn {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .now-playing-btn:hover {
+      color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    /* Playlist Grid */
+    .playlist {
+      background-color: var(--card-bg);
+      border-radius: 15px;
+      margin-top: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(255, 45, 85, 0.1);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1px;
+    }
+
+    .playlist-item {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .playlist-item:hover {
+      background-color: rgba(255, 45, 85, 0.1);
+    }
+
+    .playlist-item.active {
+      background-color: rgba(255, 45, 85, 0.2);
+    }
+
+    .playlist-item img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+    }
+
+    .playlist-item-title {
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .playlist-item-artist {
+      font-size: 0.8rem;
+      color: var(--primary-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .playlist-item-duration {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    /* Animation for album art */
+    @keyframes rotateAlbumArt {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .playing .album-art {
+      animation: rotateAlbumArt 20s linear infinite;
+    }
+
+    /* Heart beat animation for favorite button */
+    @keyframes heartBeat {
+      0% { transform: scale(1); }
+      14% { transform: scale(1.3); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.3); }
+      70% { transform: scale(1); }
+    }
+
+    .favorite.active i {
+      color: var(--primary-color);
+      animation: heartBeat 1s;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 500px) {
+      .album-art {
+        width: 240px;
+        height: 240px;
+      }
+      
+      .controls {
+        gap: 20px;
+      }
+      
+      .playlist {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating Hearts Background -->
+  <div class="hearts-container" id="heartsContainer"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container-fluid">
+      
+      <span class="navbar-brand">WavyBeats By <a class="navbar-brand" target="_blank"  href="https://instagram.com/yashh_0325/">Yashh_0325</a></span>
+      <span class="navbar-brand"><a class="navbar-brand" target="_blank"  href="feedback.html">Feedback</a></span>
+
+      <button class="btn" id="themeToggle">
+        <i class="bi bi-moon"></i>
+      </button>
+      
+    </div>
+  </nav>
+
+  <!-- Main Player -->
+  <div class="player-container">
+    <div class="album-art-container">
+      <img id="album-art" src="covers/Wavy.jpg" alt="Album Art" class="album-art">
+    </div>
+    
+    <div class="song-info">
+      <h2 id="song-title" class="song-title">Wavy</h2>
+      <p id="artist" class="artist">Karan Aujla</p>
+    </div>
+    
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+        <div class="progress-handle"></div>
+      </div>
+      <div class="time-display">
+        <span id="current-time">0:00</span>
+        <span id="duration">2:41</span>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button class="control-btn" id="shuffle">
+        <i class="bi bi-shuffle"></i>
+      </button>
+      
+      
+      <button class="control-btn" id="prev">
+        <i class="bi bi-skip-start-fill"></i>
+      </button>
+      <button class="control-btn play-btn" id="play">
+        <i class="bi bi-play-fill"></i>
+      </button>
+      <button class="control-btn" id="next">
+        <i class="bi bi-skip-end-fill"></i>
+      </button>
+      <button class="control-btn favorite" id="favorite">
+        <i class="bi bi-heart"></i>
+      </button>
+    </div>
+    
+    <!-- Playlist Grid -->
+    <div class="playlist" id="playlist">
+      <!-- Songs will be added dynamically -->
+    </div>
+  </div>
+
+  <!-- Now Playing Bar -->
+  <div class="now-playing-bar" id="nowPlayingBar">
+    <img id="now-playing-img" src="covers/Wavy.jpg" alt="Now Playing" class="now-playing-img">
+    <div class="now-playing-info">
+      <div id="now-playing-title" class="now-playing-title">Wavy</div>
+      <div id="now-playing-artist" class="now-playing-artist">Karan Aujla</div>
+    </div>
+    <div class="now-playing-controls">
+      <button class="now-playing-btn favorite" id="now-playing-favorite">
+        <i class="bi bi-heart"></i>
+      </button>
+      <button class="now-playing-btn" id="now-playing-play">
+        <i class="bi bi-play-fill"></i>
+      </button>
+    </div>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script>
+    // Songs data
+    const songs = [
+      {
+        title: "Wavy",
+        artist: "Karan Aujla",
+        src: "song/first.mp3",
+        cover: "covers/Wavy.jpg",
+        duration: "2:41"
+      },
+      {
+        title: "Ram Siya Ram",
+        artist: "",
+        src: "song/Ram Siya Ram-yt.savetube.me.mp3",
+        cover: "covers/ramsiyaram.jpg",
+        duration: "3:50"
+      },
+      {
+        title: "Dhoom Taana",
+        artist: "None",
+        src: "song/Dhoom Taana-yt.savetube.me.mp3",
+        cover: "covers/dhoom.jpg",
+        duration: "6:13"
+      },
+      {
+        title: "Sanson Ki Mala",
+        artist: "None",
+        src: "song/Sanson Ki Mala-yt.savetube.me.mp3",
+        cover: "covers/saso.jpg",
+        duration: "4:45"
+      },
+      {
+        title: "Tera Chehra",
+        artist: "None",
+        src: "song/Tera Chehra-yt.savetube.me.mp3",
+        cover: "covers/tera.jpg",
+        duration: "4:34"
+      },
+      {
+        title: "Behti Hawa Sa Tha Woh",
+        artist: "None",
+        src: "song/Behti Hawa Sa Tha Woh-yt.savetube.me.mp3",
+        cover: "covers/3idi.jpg",
+        duration: "5:02"
+      },
+      {
+        title: "Ye Tune Kiya",
+        artist: "for U ..",
+        src: "song/YE TUNE KYA KIYA-yt.savetube.me.mp3",
+        cover: "covers/yetunekiya.jpg",
+        duration: "5:14"
+      },
+      {
+        title: "O Rangerz",
+        artist: "Apne Hi Rang Mai Rang De",
+        src: "song/O Rangrez - Lyrical Video _ Bhaag Milkha Bhaag _ Farhan, Sonam _ Shreya Ghoshal, Javed Bashir-yt.savetube.me.mp3",
+        cover: "covers/apnerang.jpg",
+        duration: "6:25"
+      },
+      {
+        title: "Mere Dholna 3.0",
+        artist: " ",
+        src: "song/Mere Dholna 3.0 (Sonu Nigam Version) (From _Bhool Bhulaiyaa 3_)-yt.savetube.me.mp3",
+        cover: "covers/dhloa.jpg",
+        duration: "4:26"
+      },
+      {
+        title: "O Meri Laila",
+        artist: " ",
+        src: "song/O Meri Laila - Lyrical _ Laila Majnu _ Atif Aslam & Jyotica Tangri _ Avinash Tiwary & Tripti Dimri-yt.savetube.me.mp3",
+        cover: "covers/laila.jpg",
+        duration: "4:48"
+      },
+      {
+        title: "Wishes X Samjho Na",
+        artist: "",
+        src: "song/Wishes X Samjho Na-yt.savetube.me.mp3",
+        cover: "covers/wisha.jpg",
+        duration: "3:04"
+      },
+      {
+        title: "Skyfall",
+        artist: "",
+        src: "song/Skyfall-yt.savetube.me.mp3",
+        cover: "covers/skyfall.jpg",
+        duration: "4:46"
+      },
+      {
+        title: "Ishq Hai",
+        artist: "",
+        src: "song/Ishq Hai-yt.savetube.me.mp3",
+        cover: "covers/ishp.jpg",
+        duration: "5:12"
+      },
+      
+    ];
+
+    // DOM elements
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const shuffleBtn = document.getElementById('shuffle');
+    const favoriteBtn = document.getElementById('favorite');
+    const nowPlayingFavoriteBtn = document.getElementById('now-playing-favorite');
+    const nowPlayingPlayBtn = document.getElementById('now-playing-play');
+    const progress = document.getElementById('progress');
+    const progressBar = document.querySelector('.progress-bar');
+    const currentTimeEl = document.getElementById('current-time');
+    const durationEl = document.getElementById('duration');
+    const albumArt = document.getElementById('album-art');
+    const songTitle = document.getElementById('song-title');
+    const artist = document.getElementById('artist');
+    const nowPlayingImg = document.getElementById('now-playing-img');
+    const nowPlayingTitle = document.getElementById('now-playing-title');
+    const nowPlayingArtist = document.getElementById('now-playing-artist');
+    const playlistEl = document.getElementById('playlist');
+    const themeToggle = document.getElementById('themeToggle')
+    // Current song index
+    let currentSongIndex = 0;
+    let isPlaying = false;
+    let isShuffle = false;
+    let isRepeat = false;
+
+    // Create floating hearts
+    function createHearts() {
+      const heartsContainer = document.getElementById('heartsContainer');
+      const heartIcons = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍'];
+      
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+        
+        // Random position and delay
+        heart.style.left = `${Math.random() * 100}%`;
+        heart.style.animationDelay = `${Math.random() * 15}s`;
+        heart.style.fontSize = `${Math.random() * 20 + 10}px`;
+        
+        heartsContainer.appendChild(heart);
+      }
+    }
+
+    // Load song
+    function loadSong(song) {
+      songTitle.textContent = song.title;
+      artist.textContent = song.artist;
+      albumArt.src = song.cover;
+      audio.src = song.src;
+      durationEl.textContent = song.duration;
+      
+      // Update now playing bar
+      nowPlayingImg.src = song.cover;
+      nowPlayingTitle.textContent = song.title;
+      nowPlayingArtist.textContent = song.artist;
+    }
+
+    // Play song
+    function playSong() {
+      isPlaying = true;
+      playBtn.querySelector('i').classList.remove('bi-play-fill');
+      playBtn.querySelector('i').classList.add('bi-pause-fill');
+      nowPlayingPlayBtn.querySelector('i').classList.remove('bi-play-fill');
+      nowPlayingPlayBtn.querySelector('i').classList.add('bi-pause-fill');
+      document.querySelector('.album-art-container').parentElement.classList.add('playing');
+      audio.play();
+    }
+
+    // Pause song
+    function pauseSong() {
+      isPlaying = false;
+      playBtn.querySelector('i').classList.add('bi-play-fill');
+      playBtn.querySelector('i').classList.remove('bi-pause-fill');
+      nowPlayingPlayBtn.querySelector('i').classList.add('bi-play-fill');
+      nowPlayingPlayBtn.querySelector('i').classList.remove('bi-pause-fill');
+      document.querySelector('.album-art-container').parentElement.classList.remove('playing');
+      audio.pause();
+    }
+
+    // Previous song
+    function prevSong() {
+      currentSongIndex--;
+      if (currentSongIndex < 0) {
+        currentSongIndex = songs.length - 1;
+      }
+      loadSong(songs[currentSongIndex]);
+      if (isPlaying) playSong();
+      updateActivePlaylistItem();
+    }
+
+    // Next song
+    function nextSong() {
+      if (isShuffle) {
+        shuffleSong();
+        return;
+      }
+      
+      currentSongIndex++;
+      if (currentSongIndex > songs.length - 1) {
+        currentSongIndex = 0;
+      }
+      loadSong(songs[currentSongIndex]);
+      if (isPlaying) playSong();
+      updateActivePlaylistItem();
+    }
+
+    // Shuffle songs
+    function shuffleSong() {
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * songs.length);
+      } while (newIndex === currentSongIndex && songs.length > 1);
+      
+      currentSongIndex = newIndex;
+      loadSong(songs[currentSongIndex]);
+      if (isPlaying) playSong();
+      updateActivePlaylistItem();
+    }
+
+    // Update progress bar
+    function updateProgress(e) {
+      const { duration, currentTime } = e.srcElement;
+      const progressPercent = (currentTime / duration) * 100;
+      progress.style.width = `${progressPercent}%`;
+      
+      // Calculate display for current time
+      const currentMinutes = Math.floor(currentTime / 60);
+      let currentSeconds = Math.floor(currentTime % 60);
+      if (currentSeconds < 10) {
+        currentSeconds = `0${currentSeconds}`;
+      }
+      currentTimeEl.textContent = `${currentMinutes}:${currentSeconds}`;
+    }
+
+    // Set progress bar
+    function setProgress(e) {
+      const width = this.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+      audio.currentTime = (clickX / width) * duration;
+    }
+
+    // Update playlist active item
+    function updateActivePlaylistItem() {
+      const playlistItems = document.querySelectorAll('.playlist-item');
+      playlistItems.forEach(item => item.classList.remove('active'));
+      playlistItems[currentSongIndex].classList.add('active');
+    }
+
+    // Initialize playlist
+    function initPlaylist() {
+      songs.forEach((song, index) => {
+        const playlistItem = document.createElement('div');
+        playlistItem.classList.add('playlist-item');
+        if (index === currentSongIndex) {
+          playlistItem.classList.add('active');
+        }
+        
+        playlistItem.innerHTML = `
+          <img src="${song.cover}" alt="${song.title}" class="playlist-item-img">
+          <div class="playlist-item-title">${song.title}</div>
+          <div class="playlist-item-artist">${song.artist}</div>
+          <div class="playlist-item-duration">${song.duration}</div>
+        `;
+        
+        playlistItem.addEventListener('click', () => {
+          currentSongIndex = index;
+          loadSong(songs[currentSongIndex]);
+          playSong();
+          updateActivePlaylistItem();
+        });
+        
+        playlistEl.appendChild(playlistItem);
+      });
+    }
+
+    // Event listeners
+    playBtn.addEventListener('click', () => {
+      isPlaying ? pauseSong() : playSong();
+    });
+
+    nowPlayingPlayBtn.addEventListener('click', () => {
+      isPlaying ? pauseSong() : playSong();
+    });
+
+    prevBtn.addEventListener('click', prevSong);
+    nextBtn.addEventListener('click', nextSong);
+
+    shuffleBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.classList.toggle('active', isShuffle);
+    });
+
+    favoriteBtn.addEventListener('click', function() {
+      this.classList.toggle('active');
+    });
+
+    nowPlayingFavoriteBtn.addEventListener('click', function() {
+      this.classList.toggle('active');
+      favoriteBtn.classList.toggle('active');
+    });
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', nextSong);
+    progressBar.addEventListener('click', setProgress);
+
+    // Theme toggle
+    themeToggle.addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      const icon = this.querySelector('i');
+      if (document.body.classList.contains('dark-mode')) {
+        icon.classList.remove('bi-moon');
+        icon.classList.add('bi-sun');
+      } else {
+        icon.classList.remove('bi-sun');
+        icon.classList.add('bi-moon');
+      }
+    });
+
+    // Initialize
+    createHearts();
+    loadSong(songs[currentSongIndex]);
+    initPlaylist();
+  </script>
+  
+</body>
+</html>
