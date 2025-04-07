@@ -7,8 +7,67 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
-    /* Pink Theme */
-    :root {
+    /* Password Protection Modal */
+    .password-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .password-box {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .password-box h2 {
+      color: #ff2d55;
+      margin-bottom: 20px;
+    }
+    
+    .password-box input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+    }
+    
+    .password-box button {
+      background-color: #ff2d55;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .password-box button:hover {
+      background-color: #ff1a45;
+    }
+    
+    .error-message {
+      color: #ff2d55;
+      margin-top: 10px;
+      display: none;
+    }
+     /* Pink Theme */
+     :root {
       --primary-color: #ff2d55;
       --secondary-color: #ff8fab;
       --background-color: #fff0f3;
@@ -370,9 +429,19 @@
         grid-template-columns: 1fr;
       }
     }
+
   </style>
 </head>
 <body>
+  <div class="password-modal" id="passwordModal">
+    <div class="password-box">
+      <h2>Enter Password</h2>
+      <p>Please enter the password to access WavyBeats</p>
+      <input type="password" id="passwordInput" placeholder="Enter password">
+      <button id="submitPassword">Submit</button>
+      <p class="error-message" id="errorMessage">Incorrect password. Please try again.</p>
+    </div>
+  </div>
   <!-- Floating Hearts Background -->
   <div class="hearts-container" id="heartsContainer"></div>
 
@@ -458,6 +527,52 @@
   <audio id="audio"></audio>
 
   <script>
+    // Password Protection
+    const passwordModal = document.getElementById('passwordModal');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitPassword = document.getElementById('submitPassword');
+    const errorMessage = document.getElementById('errorMessage');
+    const correctPassword = "SY2010";
+    
+    // Check if password is already entered (using localStorage)
+    const isAuthenticated = localStorage.getItem('wavybeatsAuthenticated') === 'true';
+    
+    if (!isAuthenticated) {
+      // Show password modal
+      passwordModal.style.display = 'flex';
+      
+      // Hide all other content
+      document.querySelector('.hearts-container').style.display = 'none';
+      document.querySelector('.navbar').style.display = 'none';
+      document.querySelector('.player-container').style.display = 'none';
+      document.querySelector('.now-playing-bar').style.display = 'none';
+    }
+    
+    submitPassword.addEventListener('click', () => {
+      if (passwordInput.value === correctPassword) {
+        // Correct password
+        passwordModal.style.display = 'none';
+        localStorage.setItem('wavybeatsAuthenticated', 'true');
+        
+        // Show all content
+        document.querySelector('.hearts-container').style.display = 'block';
+        document.querySelector('.navbar').style.display = 'flex';
+        document.querySelector('.player-container').style.display = 'flex';
+        document.querySelector('.now-playing-bar').style.display = 'flex';
+      } else {
+        // Incorrect password
+        errorMessage.style.display = 'block';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    });
+    
+    // Also allow Enter key to submit password
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        submitPassword.click();
+      }
+    });
     // Songs data
     const songs = [
       {
