@@ -433,15 +433,7 @@
   </style>
 </head>
 <body>
-  <div class="password-modal" id="passwordModal">
-    <div class="password-box">
-      <h2>Enter Password</h2>
-      <p>Please enter the password to access WavyBeats</p>
-      <input type="password" id="passwordInput" placeholder="Enter password">
-      <button id="submitPassword">Submit</button>
-      <p class="error-message" id="errorMessage">Incorrect password. Please try again.</p>
-    </div>
-  </div>
+  
   <!-- Floating Hearts Background -->
   <div class="hearts-container" id="heartsContainer"></div>
 
@@ -527,54 +519,7 @@
   <audio id="audio"></audio>
 
   <script>
-    // Password Protection
-    const passwordModal = document.getElementById('passwordModal');
-    const passwordInput = document.getElementById('passwordInput');
-    const submitPassword = document.getElementById('submitPassword');
-    const errorMessage = document.getElementById('errorMessage');
-    const correctPassword = "SY2010";
-    
-    // Check if password is already entered (using localStorage)
-    const isAuthenticated = localStorage.getItem('wavybeatsAuthenticated') === 'true';
-    
-    if (!isAuthenticated) {
-      // Show password modal
-      passwordModal.style.display = 'flex';
-      
-      // Hide all other content
-      document.querySelector('.hearts-container').style.display = 'none';
-      document.querySelector('.navbar').style.display = 'none';
-      document.querySelector('.player-container').style.display = 'none';
-      document.querySelector('.now-playing-bar').style.display = 'none';
-    }
-    
-    submitPassword.addEventListener('click', () => {
-      if (passwordInput.value === correctPassword) {
-        // Correct password
-        passwordModal.style.display = 'none';
-        localStorage.setItem('wavybeatsAuthenticated', 'true');
-        
-        // Show all content
-        document.querySelector('.hearts-container').style.display = 'block';
-        document.querySelector('.navbar').style.display = 'flex';
-        document.querySelector('.player-container').style.display = 'flex';
-        document.querySelector('.now-playing-bar').style.display = 'flex';
-      } else {
-        // Incorrect password
-        errorMessage.style.display = 'block';
-        passwordInput.value = '';
-        passwordInput.focus();
-      }
-    });
-    
-    // Also allow Enter key to submit password
-    passwordInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        submitPassword.click();
-      }
-    });
-    // Songs data
-    const songs = [
+   const songs = [
       {
         title: "Wavy",
         artist: "Karan Aujla",
